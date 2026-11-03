@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#172554">
+  <title>What Would You Do?</title>
+  <style>
+    :root {
+      --navy: #172554;
+      --blue: #3157a4;
+      --blue-soft: #edf3ff;
+      --ink: #182033;
+      --muted: #667085;
+      --line: #e5e9f2;
+      --surface: #ffffff;
+      --background: #f5f7fb;
+      --accent: #e9a23b;
+      --success: #287a58;
+      --shadow: 0 18px 50px rgba(23, 37, 84, .09);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 28px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background:
+        radial-gradient(circle at 12% 8%, rgba(49,87,164,.09), transparent 28%),
+        radial-gradient(circle at 92% 90%, rgba(233,162,59,.10), transparent 25%),
+        var(--background);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    button, textarea { font: inherit; }
+    .app { width: 100%; max-width: 720px; }
+    .brand {
+      display: flex; align-items: center; justify-content: center;
+      gap: 9px; margin-bottom: 16px; color: var(--navy);
+      font-size: 13px; font-weight: 800; letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    .brand-mark {
+      width: 25px; height: 25px; border-radius: 8px;
+      display: grid; place-items: center; background: var(--navy);
+      color: white; font-size: 14px; letter-spacing: 0;
+    }
+    .panel {
+      background: var(--surface); border: 1px solid rgba(229,233,242,.9);
+      border-radius: 24px; padding: clamp(24px, 5vw, 42px);
+      box-shadow: var(--shadow);
+    }
+    .eyebrow {
+      margin: 0 0 10px; color: var(--blue); font-size: 12px;
+      font-weight: 800; letter-spacing: .13em; text-transform: uppercase;
+    }
+    h1, h2 { margin: 0; color: var(--navy); line-height: 1.15; letter-spacing: -.035em; }
+    h1 { font-size: clamp(34px, 7vw, 52px); }
+    h2 { font-size: clamp(25px, 5vw, 34px); }
+    .lead {
+      margin: 18px 0 0; color: var(--muted); font-size: 16px;
+      line-height: 1.75; max-width: 570px;
+    }
+    .note {
+      margin-top: 25px; padding: 16px 18px; border-radius: 14px;
+      background: var(--blue-soft); color: #34466d; line-height: 1.65;
+      font-size: 14px;
+    }
+    .primary, .secondary {
+      border: 0; border-radius: 13px; padding: 14px 22px;
+      cursor: pointer; font-weight: 750; transition: transform .15s, box-shadow .15s, background .15s;
+    }
+    .primary {
+      margin-top: 28px; background: var(--navy); color: white;
+      box-shadow: 0 7px 16px rgba(23,37,84,.18);
+    }
+    .primary:hover { background: #22366f; transform: translateY(-1px); }
+    .secondary { background: #eef1f7; color: var(--navy); }
+    button:focus-visible, textarea:focus-visible {
+      outline: 3px solid rgba(49,87,164,.35); outline-offset: 3px;
+    }
+    .topline {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px; margin-bottom: 13px; color: var(--muted);
+      font-size: 13px; font-weight: 700;
+    }
+    .progress-track {
+      height: 7px; background: #edf0f6; border-radius: 20px; overflow: hidden;
+      margin-bottom: 30px;
+    }
+    .progress-fill {
+      height: 100%; width: 0; border-radius: inherit; background: var(--accent);
+      transition: width .25s ease;
+    }
+    .scenario-number {
+      color: var(--blue); font-size: 12px; font-weight: 800;
+      letter-spacing: .12em; text-transform: uppercase; margin-bottom: 13px;
+    }
+    .scenario-text {
+      margin: 0; color: var(--ink); font-size: clamp(20px, 4vw, 25px);
+      line-height: 1.5; font-weight: 700;
+    }
+    .choice-list { display: grid; gap: 13px; margin-top: 28px; }
+    .choice {
+      width: 100%; text-align: left; display: flex; align-items: flex-start;
+      gap: 14px; padding: 17px; border: 1.5px solid var(--line);
+      border-radius: 15px; background: white; color: var(--ink);
+      cursor: pointer; line-height: 1.55; transition: border .15s, background .15s, transform .15s;
+    }
+    .choice:hover { border-color: #9aadd8; background: #fafbff; transform: translateY(-1px); }
+    .choice:disabled { cursor: default; opacity: 1; }
+    .choice-letter {
+      flex: 0 0 31px; height: 31px; display: grid; place-items: center;
+      border-radius: 9px; background: #f0f3f9; color: var(--navy);
+      font-size: 13px; font-weight: 850;
+    }
+    .choice.selected { border-color: var(--blue); background: var(--blue-soft); }
+    .choice.selected .choice-letter { background: var(--blue); color: white; }
+    .locked-note { margin: 17px 0 0; color: var(--muted); font-size: 12px; }
+    .recap-list { display: grid; gap: 13px; margin-top: 25px; }
+    .recap-item { padding: 17px; border: 1px solid var(--line); border-radius: 14px; }
+    .recap-q { margin: 0 0 10px; font-weight: 750; line-height: 1.5; }
+    .recap-answer {
+      display: inline-flex; align-items: flex-start; gap: 9px;
+      padding: 9px 11px; border-radius: 10px; background: var(--blue-soft);
+      color: #2c477f; font-size: 14px; line-height: 1.5;
+    }
+    .recap-answer strong { flex: 0 0 auto; }
+    .reflection { margin-top: 30px; padding-top: 27px; border-top: 1px solid var(--line); }
+    .reflection-question {
+      margin: 0; color: var(--navy); font-size: clamp(19px, 4vw, 24px);
+      line-height: 1.5; font-weight: 800;
+    }
+    .reflection-hint { margin: 10px 0 17px; color: var(--muted); font-size: 14px; line-height: 1.6; }
+    textarea {
+      width: 100%; min-height: 105px; resize: vertical; padding: 14px;
+      border: 1.5px solid var(--line); border-radius: 13px; color: var(--ink);
+      background: white; line-height: 1.55;
+    }
+    .closing {
+      margin-top: 25px; padding: 18px; border-radius: 14px;
+      background: #fff8eb; color: #674a1e; line-height: 1.7; font-size: 14px;
+    }
+    .button-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+    .button-row .primary, .button-row .secondary { margin-top: 0; }
+    .hidden { display: none !important; }
+    .footer { text-align: center; margin-top: 17px; color: #8a93a5; font-size: 11px; }
+    @media (max-width: 480px) {
+      body { padding: 14px 11px; align-items: flex-start; }
+      .app { margin: auto 0; }
+      .panel { border-radius: 19px; padding: 23px 19px; }
+      .choice { padding: 14px; gap: 11px; }
+      .button-row button { width: 100%; }
+    }
+    @media print {
+      body { background: white; padding: 0; }
+      .brand, .footer, .button-row, .reflection textarea, .reflection-hint { display: none !important; }
+      .panel { box-shadow: none; border: 0; padding: 0; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <div class="brand"><span class="brand-mark">?</span> What Would You Do?</div>
+
+    <section class="panel" id="intro">
+      <p class="eyebrow">A moment to reflect</p>
+      <h1>What Would<br>You Do?</h1>
+      <p class="lead">Ada beberapa situasi yang mungkin pernah atau akan kamu temui dalam kehidupan sehari-hari. Dalam setiap situasi, akan ada dua pilihan. Apa yang akan kamu pilih?</p>
+      <div class="note"><strong>Sebelum mulai:</strong><br>
+        Pilih jawaban yang paling menggambarkan apa yang benar-benar akan kamu lakukan. Tidak perlu mencari jawaban yang dianggap paling baik. Jawab dengan jujur dan ikuti pilihanmu sampai selesai.
+      </div>
+      <button class="primary" id="startBtn">Mulai <span aria-hidden="true">→</span></button>
+    </section>
+
+    <section class="panel hidden" id="game" aria-live="polite">
+      <div class="topline"><span id="progressLabel">Situasi 1 dari 10</span><span id="progressPercent">10%</span></div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="scenario-number" id="scenarioNumber">Situasi 01</div>
+      <p class="scenario-text" id="scenarioText"></p>
+      <div class="choice-list" id="choiceList"></div>
+      <p class="locked-note">Pilih dengan saksama. Jawaban yang sudah dipilih tidak dapat diubah.</p>
+    </section>
+
+    <section class="panel hidden" id="results">
+      <p class="eyebrow">Take a look back</p>
+      <h2>Ini pilihanmu tadi.</h2>
+      <p class="lead">Coba perhatikan kembali keputusan yang kamu ambil dalam setiap situasi.</p>
+      <div class="recap-list" id="recapList"></div>
+      <div class="reflection">
+        <p class="eyebrow">Now, think about it</p>
+        <p class="reflection-question">Jika targetmu adalah masuk perguruan tinggi, apakah menurutmu sikap dan keputusan yang kamu ambil tadi bisa mengantarkanmu ke sana?</p>
+        <p class="reflection-hint">Tidak perlu terburu-buru menjawab. Pikirkan hubungan antara pilihan-pilihan kecilmu hari ini dan tujuan yang ingin kamu capai.</p>
+        <textarea id="reflectionText" placeholder="Tuliskan pemikiranmu di sini (opsional)..."></textarea>
+        <div class="reflection" style="margin-top:22px;padding-top:22px">
+          <p class="reflection-question" style="font-size:18px">Jika diberi kesempatan, adakah keputusan yang ingin kamu ubah?</p>
+          <textarea id="changeText" placeholder="Tuliskan keputusan yang ingin kamu ubah, jika ada (opsional)..."></textarea>
+        </div>
+      </div>
+      <div class="closing"><strong>Satu hal untuk diingat:</strong><br>
+        Masa depan tidak ditentukan oleh satu pilihan saja. Namun, keputusan-keputusan kecil yang kita ambil berulang kali dapat membentuk kebiasaan, kemampuan, dan kesiapan kita untuk meraih tujuan. Kita mungkin tidak bisa mengendalikan semua hal, tetapi kita bisa mulai memperhatikan pilihan yang ada di tangan kita.
+      </div>
+      <div class="button-row">
+        <button class="primary" id="printBtn">Cetak / Simpan refleksi</button>
+        <button class="secondary" id="restartBtn">Mulai lagi</button>
+      </div>
+    </section>
+    <div class="footer">Jawab dengan jujur. Jadikan ini kesempatan untuk mengenali pilihanmu.</div>
+  </main>
+
+  <script>
+    const scenarios = [
+      {
+        question: "Hari ini ada pelajaran yang gurunya kurang aku sukai. Selama pembelajaran, aku...",
+        choices: [
+          "Tetap berusaha memperhatikan dan memahami materi.",
+          "Memilih untuk tidur karena merasa tidak tertarik."
+        ]
+      },
+      {
+        question: "Lusa, para alumni akan datang ke sekolah untuk berbagi pengalaman. Aku...",
+        choices: [
+          "Merasa malas mengikuti kegiatan tersebut dan memilih tidak masuk.",
+          "Tidak sabar menunggu kegiatan tersebut karena ingin mendengar pengalaman mereka."
+        ]
+      },
+      {
+        question: "Ketika melihat temanku mendapatkan nilai ujian yang jauh lebih tinggi dariku, aku...",
+        choices: [
+          "Mencoba mencari tahu bagaimana cara dia belajar dan memperbaiki kekuranganku.",
+          "Merasa dia memang lebih pintar dariku dan tidak terlalu memikirkannya."
+        ]
+      },
+      {
+        question: "Besok adalah hari sekolah, tetapi teman-temanku mengajak bermain sampai larut malam. Aku...",
+        choices: [
+          "Ikut bermain karena kesempatan berkumpul seperti ini jarang ada.",
+          "Memilih pulang lebih awal agar bisa beristirahat dan mempersiapkan hari esok."
+        ]
+      },
+      {
+        question: "Aku menemukan informasi beasiswa pendidikan yang menarik, tetapi persyaratannya cukup banyak. Aku...",
+        choices: [
+          "Mencoba mencari tahu persyaratannya dan mempersiapkan diri.",
+          "Mengabaikannya karena merasa belum tentu bisa mendapatkannya."
+        ]
+      },
+      {
+        question: "Guru memberikan kritik bahwa hasil pekerjaanku masih jauh dari harapan. Aku...",
+        choices: [
+          "Mencoba menerima masukan dan memperbaiki pekerjaanku.",
+          "Merasa guru terlalu banyak menuntut dan tidak memahami usahaku."
+        ]
+      },
+      {
+        question: "Teman-temanku mulai sering membicarakan rencana setelah lulus SMA. Namun, aku sendiri belum punya gambaran. Aku...",
+        choices: [
+          "Mulai mencari informasi tentang pilihan pendidikan dan karier yang tersedia.",
+          "Tidak terlalu memikirkannya karena masih ada banyak waktu."
+        ]
+      },
+      {
+        question: "Sepulang sekolah, aku berniat membuka media sosial sebentar sebelum mengerjakan aktivitas lainnya. Aku...",
+        choices: [
+          "Menentukan batas waktu agar aktivitas lainnya tetap terlaksana.",
+          "Menikmati media sosial selama masih ingin menggunakannya."
+        ]
+      },
+      {
+        question: "Ketika sedang asyik mengerjakan sesuatu, ternyata sudah memasuki waktu ibadah. Aku...",
+        choices: [
+          "Menyelesaikan semuanya dahulu, baru melaksanakan ibadah.",
+          "Mengatur kegiatanku agar tetap bisa melaksanakan ibadah tepat waktu."
+        ]
+      },
+      {
+        question: "Aku memiliki kesempatan untuk memilih jurusan kuliah. Ada satu jurusan yang sangat aku minati, tetapi teman-temanku lebih banyak memilih jurusan lain yang sedang populer. Aku...",
+        choices: [
+          "Tetap mempertimbangkan jurusan yang sesuai dengan minat, kemampuan, dan tujuanku.",
+          "Memilih jurusan yang banyak diminati teman-temanku agar tidak merasa salah langkah sendiri."
+        ]
+      }
+    ];
+
+    const intro = document.getElementById("intro");
+    const game = document.getElementById("game");
+    const results = document.getElementById("results");
+    const progressLabel = document.getElementById("progressLabel");
+    const progressPercent = document.getElementById("progressPercent");
+    const progressFill = document.getElementById("progressFill");
+    const scenarioNumber = document.getElementById("scenarioNumber");
+    const scenarioText = document.getElementById("scenarioText");
+    const choiceList = document.getElementById("choiceList");
+    const recapList = document.getElementById("recapList");
+
+    let currentIndex = 0;
+    let answers = [];
+
+    function show(section) {
+      [intro, game, results].forEach(el => el.classList.add("hidden"));
+      section.classList.remove("hidden");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function startGame() {
+      currentIndex = 0;
+      answers = [];
+      document.getElementById("reflectionText").value = "";
+      document.getElementById("changeText").value = "";
+      show(game);
+      renderScenario();
+    }
+
+    function renderScenario() {
+      const item = scenarios[currentIndex];
+      const number = currentIndex + 1;
+      const percent = Math.round((number / scenarios.length) * 100);
+      progressLabel.textContent = `Situasi ${number} dari ${scenarios.length}`;
+      progressPercent.textContent = `${percent}%`;
+      progressFill.style.width = `${percent}%`;
+      scenarioNumber.textContent = `Situasi ${String(number).padStart(2, "0")}`;
+      scenarioText.textContent = item.question;
+      choiceList.innerHTML = "";
+
+      item.choices.forEach((choice, index) => {
+        const button = document.createElement("button");
+        button.className = "choice";
+        button.type = "button";
+        const letter = document.createElement("span");
+        letter.className = "choice-letter";
+        letter.textContent = index === 0 ? "A" : "B";
+        const text = document.createElement("span");
+        text.textContent = choice;
+        button.append(letter, text);
+        button.addEventListener("click", () => selectAnswer(index));
+        choiceList.appendChild(button);
+      });
+    }
+
+    function selectAnswer(choiceIndex) {
+      if (answers[currentIndex] !== undefined) return;
+      answers[currentIndex] = choiceIndex;
+      const buttons = [...choiceList.querySelectorAll("button")];
+      buttons.forEach((button, index) => {
+        button.disabled = true;
+        if (index === choiceIndex) button.classList.add("selected");
+      });
+      window.setTimeout(() => {
+        currentIndex += 1;
+        if (currentIndex < scenarios.length) {
+          renderScenario();
+        } else {
+          renderResults();
+        }
+      }, 420);
+    }
+
+    function renderResults() {
+      recapList.innerHTML = "";
+      scenarios.forEach((item, index) => {
+        const chosen = answers[index];
+        const card = document.createElement("div");
+        card.className = "recap-item";
+        const question = document.createElement("p");
+        question.className = "recap-q";
+        question.textContent = `${index + 1}. ${item.question}`;
+        const answer = document.createElement("div");
+        answer.className = "recap-answer";
+        const label = document.createElement("strong");
+        label.textContent = chosen === 0 ? "Pilihan A" : "Pilihan B";
+        const answerText = document.createElement("span");
+        answerText.textContent = item.choices[chosen];
+        answer.append(label, answerText);
+        card.append(question, answer);
+        recapList.appendChild(card);
+      });
+      show(results);
+    }
+
+    document.getElementById("startBtn").addEventListener("click", startGame);
+    document.getElementById("restartBtn").addEventListener("click", startGame);
+    document.getElementById("printBtn").addEventListener("click", () => window.print());
+  </script>
+</body>
+</html>
